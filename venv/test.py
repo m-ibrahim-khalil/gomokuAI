@@ -1,37 +1,27 @@
 import numpy as np
 
-board = np.zeros((4, 4))
+from minimax_algorithm import AI
+
+board = np.zeros((7, 7))
+board[3][1]=1
+board[2][1]=1
 board[1][1]=1
-board[2][2]=2
-board[3][3]=3
-board[3][2] = 5
+board[0][1]=1
+board[4][1] = 1
+board[5][5] = 2
+board[3][3] = 1
+board[3][2]=1
+board[2][2]=1
+board[1][3]=1
+board[0][4]=1
+board[4][5] = 1
+board[5][6] = 2
+board[3][6] = 1
+board[1][4]=1
+board[2][5] = 1
+board[5][6] = 2
+board[6][6] = 1
 
-# for r in range(4):
-#     print(board)
-#     row_array = [int(i) for i in list(board[r,:])]
-#     print(row_array)
-#     col_arr = [int(i) for i in list(board[:,r])]
-#     print(col_arr)
-
-
-def get_huScore(board, r, c):
-        lr = 0
-        hr = 3
-        lc = 0
-        hc = 3
-        if r-3 > 0:
-            lr = r-3
-        if r+3 < 3:
-            hr = r+3
-        if c-3 > 0:
-            lc = c-3
-        if c+3 < 3:
-            hc = c+3
-        print(lc)
-        print(hc)
-        l = min(hc-lc, hr-lr)+1
-        arr = [board[i][i] for i in range(l)]
-        print(arr)
-
-print(board)
-get_huScore(board, 1, 0)
+ai = AI(7, 7)
+print(ai.winning_move(board, 1))
+print(len(ai.get_available_cells_incomplete(board)))

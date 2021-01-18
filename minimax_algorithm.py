@@ -5,8 +5,7 @@ import numpy as np
 
 
 class AI:
-    def __init__(self, board, COLUMN_COUNT, ROW_COUNT):
-        self.board = board
+    def __init__(self, COLUMN_COUNT, ROW_COUNT):
         self.ROW_COUNT = ROW_COUNT
         self.COLUMN_COUNT = COLUMN_COUNT
         self.humanPiece = 1
@@ -64,8 +63,9 @@ class AI:
         else:
             return False
 
-    def get_available_cells(self, board):
+    def get_available_cells_incomplete(self, board):
         valid_locations = []
+        board1 = board.copy()
         fx = [+0, +0, +1, -1, -1, +1, -1, +1]
         fy = [-1, +1, +0, +0, +1, +1, -1, -1]
         for r in range(self.ROW_COUNT):
@@ -73,9 +73,18 @@ class AI:
                 if board[r][c] != 0:
                     for i in range(8):
                         if self.is_terminal(r+fx[i], c+fy[i]):
-                            if board[r+fx[i]][c+fy[i]] == 0:
+                            if board1[r+fx[i]][c+fy[i]] == 0:
+                                board1[r+fx[i]][c+fy[i]] = 1
                                 valid_locations.append([r+fx[i], c+fy[i]])
         return valid_locations
+
+    def get_available_cells(self, board):
+        valid_cells = []
+        for r in range(self.ROW_COUNT):
+            for c in range(self.COLUMN_COUNT):
+                if board[r][c] == 0:
+                    valid_cells.append([r, c])
+        return valid_cells
 
     def drop_piece(self, board, row, col, piece):
         board[row][col] = piece
@@ -100,7 +109,7 @@ class AI:
 
         return score
 
-    def score_position(self, board, piece):
+    def intermediate_score(self, board, piece):
         score = 0
         # Score center column
         center_col = [int(i) for i in list(board[:, self.COLUMN_COUNT//2])]
@@ -165,28 +174,28 @@ class AI:
                 if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and \
                         board[r - 3][c + 3] == piece and board[r - 4][c + 4] == piece:
                     return True
+        return False
 
     def minimax(self, board, depth, alpha, beta, turnAI):
-        availableCells = self.get_available_cells(board)
-        # print(len(availableCells))
+        availableCells = self.get_available_cells_incomplete(board)
         if self.winning_move(board, self.AiPiece):
             return None, 100*depth
         elif self.winning_move(board, self.humanPiece):
             return None, -100*depth
         elif len(availableCells) == 0:
-            return None, 0              #draw
+            return None, 0
         elif depth == 0:
             # if turnAI:
-            #     return None, self.score_position(board, self.AiPiece)
+            #     return None, self.intermediate_score(board, self.AiPiece)
             # else:
-            #     return None, self.score_position(board, self.humanPiece)
+            #     return None, self.intermediate_score(board, self.humanPiece)
             return None, 0
 
         if turnAI:
             value = -math.inf
-            cell = None
+            cell = random.choice(availableCells)
             for cel in availableCells:
-                b_copy = self.board.copy()
+                b_copy = board.copy()
                 self.drop_piece(b_copy, cel[0], cel[1], self.AiPiece)
                 new_score = self.minimax(b_copy, depth-1, alpha, beta, False)[1]
                 if new_score > value:
@@ -201,7 +210,7 @@ class AI:
             value = math.inf
             cell = random.choice(availableCells)
             for cel in availableCells:
-                b_copy = self.board.copy()
+                b_copy = board.copy()
                 self.drop_piece(b_copy, cel[0], cel[1], self.humanPiece)
                 new_score = self.minimax(b_copy, depth-1, alpha, beta, True)[1]
                 if new_score < value:
@@ -212,8 +221,8 @@ class AI:
                     break
             return cell, value
 
-    def move(self):
-        cell, value = self.minimax(self.board, 5, -math.inf, math.inf, True)
+    def move(self, board):
+        cell, value = self.minimax(board, 5, -math.inf, math.inf, True)
         print(value)
         return cell
 
