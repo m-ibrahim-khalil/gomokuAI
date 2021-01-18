@@ -1,5 +1,7 @@
 import numpy as np
 
+from minimax_algorithm import AI
+
 ROW_COUNT = 9
 COLUMN_COUNT = 9
 
@@ -62,11 +64,23 @@ while not gameOver:
             print("Player 1 win!!")
             gameOver = True
 
-    else:
-        rowSelection = int(input("Make your row selection (1-9): ")) - 1
-        colSelection = int(input("Make your column selection (1-9): ")) - 1
-        if is_valid(board, rowSelection, colSelection):
-            drop_piece(board, rowSelection, colSelection, 2)
+    else: #player 2
+        # rowSelection = int(input("Make your row selection (1-9): ")) - 1
+        # colSelection = int(input("Make your column selection (1-9): ")) - 1
+        # if is_valid(board, rowSelection, colSelection):
+        #     drop_piece(board, rowSelection, colSelection, 2)
+        # else:
+        #     print("invalid turn")
+        #     continue
+        # if winning_move(board, 2):
+        #     print("Player 2 win!!")
+        #     gameOver = True
+
+        # AI
+        ai = AI(board, COLUMN_COUNT, ROW_COUNT)
+        cell = ai.move()
+        if is_valid(board, cell[0], cell[1]):
+            drop_piece(board, cell[0], cell[1], 2)
         else:
             print("invalid turn")
             continue
