@@ -23,7 +23,7 @@ class GUI:
         self._stone_black = None
         self._stone_white = None
         # self.myfont = pygame.font.SysFont("ubuntumono", 60)
-        self.myfont = pygame.font.Font("/usr/share/fonts/truetype/malayalam/Suruma.ttf", 65)
+        self.myfont = pygame.font.Font("/usr/share/fonts/truetype/malayalam/Suruma.ttf", 55)
 
     def run(self, board):
         self._screen = pygame.display.set_mode(self._screen_size, 0, 32)
@@ -86,5 +86,14 @@ class GUI:
             self._screen.blit(label, (40, 10))
         else:
             label = self.myfont.render("Tie!", True, RED)
+            self._screen.blit(label, (40, 10))
+        pygame.display.update()
+
+    def turn (self, who):
+        if who == 1:
+            label = self.myfont.render("Human turn", True, RED)
+            self._screen.blit(label, (40, 10))
+        else:
+            label = self.myfont.render("Ai turn", True, RED)
             self._screen.blit(label, (40, 10))
         pygame.display.update()

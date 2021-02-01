@@ -1,55 +1,96 @@
+import numpy as np
+
 PLAYER_PIECE = 1
 AI_PIECE = 2
 EMPTY = 0
-COLUMN_COUNT = 10
-ROW_COUNT = 10
-WINDOW_LENGTH = 5
+COLUMN_COUNT = 4
+ROW_COUNT = 4
+WINDOW_LENGTH = 2
 
 
-def evaluate_window(window, piece):
-    score = 0
-    opp_piece = PLAYER_PIECE
-    if piece == PLAYER_PIECE:
-        opp_piece = AI_PIECE
+def get_rows(grid):
+    return [[c for c in r] for r in grid]
 
-    if window.count(piece) == 4:
-        score += 100
-    elif window.count(piece) == 3 and window.count(EMPTY) == 1:
-        score += 5
-    elif window.count(piece) == 2 and window.count(EMPTY) == 2:
-        score += 2
 
-    if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
-        score -= 4
+def get_cols(grid):
+    return zip(*grid)
 
-    return score
+
+def get_backward_diagonals(grid):
+    b = [None] * (len(grid) - 1)
+    grid = [b[i:] + r + b[:i] for i, r in enumerate(get_rows(grid))]
+    return [[c for c in r if c is not None] for r in get_cols(grid)]
+
+
+def get_forward_diagonals(grid):
+    b = [None] * (len(grid) - 1)
+    grid = [b[:i] + r + b[i:] for i, r in enumerate(get_rows(grid))]
+    return [[c for c in r if c is not None] for r in get_cols(grid)]
 
 
 def huristic_score(board, piece):
-    score = 0
-    #Horizontal
+    rcount = 0
+    colcount = 0
+    v1Count = 0
+    v2Count = 0
+    if piece == 2:
+        return 0
+
     for r in range(ROW_COUNT):
         row_array = [int(i) for i in list(board[r, :])]
-        for c in range(COLUMN_COUNT - 4):
-            window = row_array[c:c + WINDOW_LENGTH]
-            score += evaluate_window(window, piece)
+        count = 0
+        for i in range(len(row_array)-1):
+            if row_array[i] == piece:
+                if row_array[i+1] == 2:
+                    count +=1
+                elif row_array[i+1] == 0:
+                    count+=1
+                else:
+                    count -= 2
+        if(rcount < count):
+            rcount = count
 
-    #Vertical
     for c in range(COLUMN_COUNT):
         col_array = [int(i) for i in list(board[:, c])]
-        for r in range(ROW_COUNT - 4):
-            window = col_array[r:r + WINDOW_LENGTH]
-            score += evaluate_window(window, piece)
+        count = 0
+        for i in range(len(col_array)-1):
+            if col_array[i] == piece:
+                if col_array[i+1] == 2:
+                    count +=2
+                elif col_array[i+1] == 0:
+                    count+=1
+                else:
+                    count -= 2
+        if(colcount < count):
+            colcount = count
 
-   # diagonal
-    for r in range(ROW_COUNT - 4):
-        for c in range(COLUMN_COUNT - 4):
-            window = [board[r + i][c + i] for i in range(WINDOW_LENGTH)]
-            score += evaluate_window(window, piece)
+    v1 = get_backward_diagonals(board)
+    for i in range(4, len(v1)-4):
+        count = 0
+        for j in range(len(v1[i])-1):
+            if v1[i][j+1] == 2:
+                    count +=2
+            elif v1[i][j+1] == 0:
+                count+=1
+            else:
+                count -= 2
+        if(v1Count < count):
+            v1Count = count
 
-    for r in range(ROW_COUNT - 4):
-        for c in range(COLUMN_COUNT - 4):
-            window = [board[r + 4 - i][c + i] for i in range(WINDOW_LENGTH)]
-            score += evaluate_window(window, piece)
+    v2 = get_forward_diagonals(board)
+    for i in range(4, len(v2)-4):
+        count = 0
+        for j in range(len(v2[i])-1):
+            if v2[i][j+1] == 2:
+                    count +=2
+            elif v2[i][j+1] == 0:
+                count+=1
+            else:
+                count -= 2
+        if(v2Count < count):
+            v2Count = count
 
+    # print(rcount, colcount, v1Count, v2Count)
+    score = max(rcount, colcount, v1Count, v2Count)
+    # print(score)
     return score

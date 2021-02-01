@@ -47,21 +47,6 @@ class Board:
         available_cell.remove((r, c))
         return available_cell
 
-    # def get_available_cells(self):
-    #     valid_locations = []
-    #     board1 = self.board.copy()
-    #     fx = [+0, +0, +1, -1, -1, +1, -1, +1]
-    #     fy = [-1, +1, +0, +0, +1, +1, -1, -1]
-    #     for r in range(self.ROW_COUNT):
-    #         for c in range(self.COLUMN_COUNT):
-    #             if self.board[r][c] != 0:
-    #                 for i in range(8):
-    #                     if self.is_terminal(r+fx[i], c+fy[i]):
-    #                         if board1[r+fx[i]][c+fy[i]] == 0:
-    #                             board1[r+fx[i]][c+fy[i]] = 1
-    #                             valid_locations.append([r+fx[i], c+fy[i]])
-    #     return valid_locations
-
     def winning_move(self, piece):
         # case: 1 Horizontal check
         for c in range(self.COLUMN_COUNT - 4):

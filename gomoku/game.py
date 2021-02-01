@@ -19,9 +19,9 @@ class Game:
         # print(len(available_cell))
         # print(available_cell)
         if self.Board1.winning_move(self.player2.piece):
-            return None, 100000000000000*depth
+            return None, 10000*depth
         elif self.Board1.winning_move(self.player1.piece):
-            return None, -10000000000000*depth
+            return None, -10000*depth
         elif len(available_cell) == 0:
             return None, 0
         elif depth == 0:
@@ -61,18 +61,16 @@ class Game:
             return cell, value
 
     def get_cell(self, available_cell):
-        # print(len(available_cell))
-        # print(available_cell)
         cell, value = self.minimax(5, -math.inf, math.inf, True, available_cell.copy())
         return cell[0], cell[1]
 
     def game_loop(self):
-        gameOver = False
         turn = 0
         self.gui.run(self.Board1.board)
         available_cell = {(5, 5)}
         while True:
             for event in pygame.event.get():
+                self.gui.turn(1)
                 if event.type == pygame.QUIT:
                     # print("> exit")
                     pygame.quit()
@@ -97,31 +95,15 @@ class Game:
                             self.gui.winner(1)
                             gameOver = True
 
-                    # elif turn == 1 and not gameOver:  # Ai
-                    #     # row, col = self.get_cell(available_cell)
-                    #     # print(row, col)
-                    #     if self.Board1.is_valid_cell(row, col):
-                    #         self.Board1.drop_piece(row, col, self.player2.piece)
-                    #         available_cell.add((row, col))
-                    #         available_cell = self.Board1.get_available_cells_copy(row, col, available_cell)
-                    #         # print(self.Board1.board)
-                    #         self.gui.run(self.Board1.board)
-                    #         turn = 0
-                    #     else:
-                    #         print("invalid turn")
-                    #         continue
-                    #     if self.Board1.winning_move(self.player2.piece):
-                    #         print("Congrats Ai win!!")
-                    #         gameOver = True
-
-            if turn == 1 and not gameOver:  # Ai
+            if turn == 1:  # Ai
+                self.gui.turn(2)
                 row, col = self.get_cell(available_cell)
                 print(row, col)
                 if self.Board1.is_valid_cell(row, col):
                     self.Board1.drop_piece(row, col, self.player2.piece)
                     available_cell.add((row, col))
                     available_cell = self.Board1.get_available_cells_copy(row, col, available_cell)
-                    print(self.Board1.board)
+                    # print(self.Board1.board)
                     self.gui.run(self.Board1.board)
                     turn = 0
                 else:
@@ -129,9 +111,4 @@ class Game:
                     continue
                 if self.Board1.winning_move(self.player2.piece):
                     self.gui.winner(2)
-                    gameOver = True
-
-            if gameOver:
-                pygame.time.wait(10000)
-                break
 
