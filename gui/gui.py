@@ -1,5 +1,5 @@
 import time
-
+import sys
 import numpy
 import pygame
 from pygame.locals import *
@@ -9,10 +9,12 @@ from gomoku.board import Board
 background_image = 'desk.png'
 white_image = 'white1.png'
 black_image = 'black1.png'
+RED = (255, 0, 0)
 
 
 class GUI:
     def __init__(self, screen_size, board_size=15):
+        pygame.init()
         self._screen_size = screen_size
         self._board_size = board_size
         self.spacing = int(self._screen_size[1] / (board_size + 1))
@@ -20,9 +22,10 @@ class GUI:
         self._background = None
         self._stone_black = None
         self._stone_white = None
+        # self.myfont = pygame.font.SysFont("ubuntumono", 60)
+        self.myfont = pygame.font.Font("/usr/share/fonts/truetype/malayalam/Suruma.ttf", 65)
 
     def run(self, board):
-        pygame.init()
         self._screen = pygame.display.set_mode(self._screen_size, 0, 32)
         self._background = pygame.image.load(background_image).convert()
         self._stone_black = pygame.image.load(black_image).convert_alpha()
@@ -74,3 +77,14 @@ class GUI:
                 elif new_board[row][col] == 2:
                     self._move(2, (row, col))
 
+    def winner(self, who):
+        if who == 1:
+            label = self.myfont.render("Congrats Human wins!!", True, RED)
+            self._screen.blit(label, (40, 10))
+        elif who == 2:
+            label = self.myfont.render("Congrats Ai wins!!", True, RED)
+            self._screen.blit(label, (40, 10))
+        else:
+            label = self.myfont.render("Tie!", True, RED)
+            self._screen.blit(label, (40, 10))
+        pygame.display.update()

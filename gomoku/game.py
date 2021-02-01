@@ -3,26 +3,29 @@ import pygame
 from pygame.locals import *
 
 from gomoku.board import Board
+from gomoku.huristic_evalution import huristic_score
 from gomoku.players import HumanPlayer, AiPlayer
 from gui.gui import GUI
 
 
 class Game:
-    def __init__(self, screen_size):
-        self.Board1 = Board(15, 15)
+    def __init__(self, screen_size, board_size):
+        self.Board1 = Board(board_size, board_size)
         self.player1 = HumanPlayer(1)
         self.player2 = AiPlayer(2)
-        self.gui = GUI(screen_size, 15)
+        self.gui = GUI(screen_size, board_size)
 
     def minimax(self, depth, alpha, beta, turnAI, available_cell):
+        # print(len(available_cell))
+        # print(available_cell)
         if self.Board1.winning_move(self.player2.piece):
-            return None, 100*depth
+            return None, 100000000000000*depth
         elif self.Board1.winning_move(self.player1.piece):
-            return None, -100*depth
+            return None, -10000000000000*depth
         elif len(available_cell) == 0:
             return None, 0
         elif depth == 0:
-            return None, 0
+            return None, huristic_score(self.Board1.board, 2)
 
         if turnAI:
             value = -math.inf
@@ -58,6 +61,8 @@ class Game:
             return cell, value
 
     def get_cell(self, available_cell):
+        # print(len(available_cell))
+        # print(available_cell)
         cell, value = self.minimax(5, -math.inf, math.inf, True, available_cell.copy())
         return cell[0], cell[1]
 
@@ -69,7 +74,7 @@ class Game:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print("> exit")
+                    # print("> exit")
                     pygame.quit()
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -89,7 +94,7 @@ class Game:
                             print("invalid turn")
                             continue
                         if self.Board1.winning_move(self.player1.piece):
-                            print("Player 1 win!!")
+                            self.gui.winner(1)
                             gameOver = True
 
                     # elif turn == 1 and not gameOver:  # Ai
@@ -123,10 +128,10 @@ class Game:
                     print("invalid turn")
                     continue
                 if self.Board1.winning_move(self.player2.piece):
-                    print("Congrats Ai win!!")
+                    self.gui.winner(2)
                     gameOver = True
 
             if gameOver:
-                pygame.time.wait(3000)
+                pygame.time.wait(10000)
                 break
 
